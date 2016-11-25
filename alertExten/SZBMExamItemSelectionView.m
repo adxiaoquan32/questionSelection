@@ -419,7 +419,16 @@ static char SZBMQuestionOptionInfoTouchEx_reconigzerInfoKey;
         
         return YES;
     }
-    return NO;
+    else
+    {
+        for ( SZBMQuestionOptionInfo *opInfo in self.selectionInfo.selects )
+        {
+            SZBMQuestionOptionInfoTouchEx *exInfo = [[self class] _reconigzerInfo:opInfo];
+            exInfo.state = enSZBMQOInfoTState_Nomal;
+        } 
+        [self setNeedsDisplay];
+        return NO;
+    }
 }
 - (BOOL)continueTrackingWithTouch:(UITouch *)touch withEvent:(nullable UIEvent *)event
 {
