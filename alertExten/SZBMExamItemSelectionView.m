@@ -11,6 +11,8 @@
 #import <CoreText/CoreText.h>
 #import "objc/runtime.h"
 
+#define SZBMExamItemSelectionView_ex_padding 4.0f
+
 @interface SZBMExamItemSelectionView()
 
 @property (nonatomic, strong) SZBMQuestionInfo *selectionInfo;
@@ -384,7 +386,7 @@ static char SZBMQuestionOptionInfoTouchEx_reconigzerInfoKey;
     for ( SZBMQuestionOptionInfo *opInfo in self.selectionInfo.selects )
     {
         SZBMQuestionOptionInfoTouchEx *exInfo = [[self class] _reconigzerInfo:opInfo];
-        if ( CGRectContainsPoint(exInfo.reconigzerArea,point) ) {
+        if ( CGRectContainsPoint([self _enlargeTouchingArea:exInfo.reconigzerArea],point) ) {
             b_isIN = YES;
             break;
         }
@@ -393,6 +395,15 @@ static char SZBMQuestionOptionInfoTouchEx_reconigzerInfoKey;
     
 }
 
+- (CGRect)_enlargeTouchingArea:(CGRect)srt
+{
+    CGRect rt = srt;
+    rt.origin.y -= SZBMExamItemSelectionView_ex_padding;
+    rt.size.height += SZBMExamItemSelectionView_ex_padding*2;
+    return rt;
+}
+
+#pragma mark touching reconigzer area
 - (BOOL)beginTrackingWithTouch:(UITouch *)touch withEvent:(nullable UIEvent *)event
 {
     if ( [self _detectTouchIfInSeleectArea:touch] ) {
@@ -401,7 +412,7 @@ static char SZBMQuestionOptionInfoTouchEx_reconigzerInfoKey;
         for ( SZBMQuestionOptionInfo *opInfo in self.selectionInfo.selects )
         {
             SZBMQuestionOptionInfoTouchEx *exInfo = [[self class] _reconigzerInfo:opInfo];
-            CGRect rt = exInfo.reconigzerArea;
+            CGRect rt = [self _enlargeTouchingArea:exInfo.reconigzerArea];
             exInfo.state = CGRectContainsPoint(rt,point)?enSZBMQOInfoTState_TouchDown:enSZBMQOInfoTState_Nomal;
         }
         [self setNeedsDisplay];
@@ -423,7 +434,7 @@ static char SZBMQuestionOptionInfoTouchEx_reconigzerInfoKey;
         for ( SZBMQuestionOptionInfo *opInfo in self.selectionInfo.selects )
         {
             SZBMQuestionOptionInfoTouchEx *exInfo = [[self class] _reconigzerInfo:opInfo];
-            CGRect rt = exInfo.reconigzerArea;
+            CGRect rt = [self _enlargeTouchingArea:exInfo.reconigzerArea];
             
             // 试题类型：0 单选 1 多选
             if ( [self.selectionInfo.type integerValue] == 1) {
